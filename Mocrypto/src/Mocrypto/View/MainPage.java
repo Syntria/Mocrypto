@@ -42,7 +42,7 @@ public class MainPage extends JFrame implements IPage{
     private JButton btn_logout;
     private JButton btn_refresh;
 
-    private DefaultTableModel model_course_list;
+    private DefaultTableModel model_crypto_list;
     private Object[] row_cryptocurrency_list;
 
 
@@ -114,12 +114,12 @@ public class MainPage extends JFrame implements IPage{
         lbl_mainpage_welcome.setText("Welcome: " + currentUser.getName() + " " +currentUser.getSurname());
         lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getBalance() + " USD");
 
-        model_course_list= new DefaultTableModel();
+        model_crypto_list = new DefaultTableModel();
         Object[] col_courseList= {"Name","Symbol", "Current Price"};
-        model_course_list.setColumnIdentifiers(col_courseList);
+        model_crypto_list.setColumnIdentifiers(col_courseList);
         row_cryptocurrency_list = new Object[col_courseList.length];
         loadCryptocurrencyModel(cryptocurrencyList);
-        tbl_crypto_list.setModel(model_course_list);
+        tbl_crypto_list.setModel(model_crypto_list);
         tbl_crypto_list.getColumnModel().getColumn(0).setMaxWidth(75);
         tbl_crypto_list.getTableHeader().setReorderingAllowed(false);
     }
@@ -134,7 +134,7 @@ public class MainPage extends JFrame implements IPage{
             row_cryptocurrency_list[i++]=obj.getName();
             row_cryptocurrency_list[i++]=obj.getShortname();
             row_cryptocurrency_list[i++]=obj.getPrice();
-            model_course_list.addRow(row_cryptocurrency_list);
+            model_crypto_list.addRow(row_cryptocurrency_list);
         }
     }
 
