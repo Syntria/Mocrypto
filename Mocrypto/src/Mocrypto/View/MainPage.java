@@ -4,6 +4,7 @@ import Mocrypto.Helper.Config;
 import Mocrypto.Helper.CryptocurrencyAPI;
 import Mocrypto.Helper.Helper;
 import Mocrypto.Helper.SQLConnector;
+import Mocrypto.Model.Account;
 import Mocrypto.Model.Cryptocurrency;
 import Mocrypto.Model.User;
 
@@ -11,6 +12,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -53,10 +55,7 @@ public class MainPage extends JFrame implements IPage{
     public MainPage(User user) {
 
         currentUser = user;
-
-        cryptocurrencyList = cryptocurrencyAPI.getCryptocurrencyList();
-
-
+        
         display();
 
         btn_refresh.addActionListener(new ActionListener() {
@@ -97,6 +96,12 @@ public class MainPage extends JFrame implements IPage{
                 LoginPage loginPage = new LoginPage();
             }
         });
+        btn_crypto_buy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
     }
 
     @Override
@@ -110,6 +115,8 @@ public class MainPage extends JFrame implements IPage{
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setTitle(Config.PROJECT_TITLE);
         setVisible(true);
+
+        cryptocurrencyList = getCryptocurrencyList();
 
         lbl_mainpage_welcome.setText("Welcome: " + currentUser.getName() + " " +currentUser.getSurname());
         lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getBalance() + " USD");
@@ -147,16 +154,42 @@ public class MainPage extends JFrame implements IPage{
             ResultSet rs=st.executeQuery("SELECT * from cryptocurrency"); /* for portfolio WHERE user_id = " + currentUser.getId())*/;
             while (rs.next()){
 
+                String uuid = rs.getString("uuid");
                 String name = rs.getString("name");
-                String shortName = rs.getString("short_name");
-                int price = rs.getInt("price");
-                //cryptocurrency = new Cryptocurrency(name, shortName, price);
-                //cryptocurrencyList.add(cryptocurrency);
+                String shortName = rs.getString("shortname");
+                double price = rs.getDouble("price");
+                double volume = rs.getDouble("volume");
+                cryptocurrency = new Cryptocurrency(uuid, name, shortName, price, volume);
+                cryptocurrencyList.add(cryptocurrency);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return cryptocurrencyList;
+    }
+
+    public static boolean add(int user_id,String crypto_id,String shortname,double buy_price, double amount){
+        String query="INSERT INTO owned_cryptocurrency (user_id,crypto_id,shortname,buy_price,amount) VALUES (?,?,?,?,?,?)";
+
+        try {
+            PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);
+            pr.setInt(1,user_id);
+            pr.setString(2,crypto_id);
+            pr.setString(3,shortname);
+            pr.setDouble(4,buy_price);
+            pr.setDouble(5,amount);
+            int response= pr.executeUpdate();
+
+            if(response == -1){
+                Helper.showMsg("error");
+            }
+            return response != -1;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return true;
     }
 
 

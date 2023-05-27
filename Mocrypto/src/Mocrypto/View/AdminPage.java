@@ -16,7 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class AdminPage extends JFrame implements IPage{
 
@@ -32,6 +31,7 @@ public class AdminPage extends JFrame implements IPage{
     private JTable table_systemcrypto_list;
     private JButton button_crypto_remove;
     private JTextField field_removecrypto_name;
+    private JButton button_admin_quit;
 
     Object[] col_cryptoList= {"ID","Name","Symbol"};
 
@@ -63,6 +63,13 @@ public class AdminPage extends JFrame implements IPage{
         }
         display();
 
+        button_admin_quit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                LoginPage loginPage = new LoginPage();
+            }
+        });
     }
 
     public void display() {
