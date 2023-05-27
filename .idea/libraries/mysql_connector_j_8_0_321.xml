@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="mysql-connector-j-8.0.32">
+  <library name="mysql-connector-j-8.0.321">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/Mocrypto/mysql-connector-j-8.0.32.jar!/" />
     </CLASSES>

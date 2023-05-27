@@ -2,14 +2,22 @@ package Mocrypto.Model;
 
 public class Cryptocurrency {
 
+    private final String uuid;
     private String name;
     private String shortname;
-    private int price;
+    private double price;
+    private double volume;
 
-    public Cryptocurrency(String name, String shortname, int price) {
+    public Cryptocurrency(String uuid, String name, String shortname, double price,double volume) {
+        this.uuid = uuid;
         this.name = name;
         this.shortname = shortname;
         this.price = price;
+        this.volume = volume;
+    }
+
+    public String getUuid() {
+        return uuid;
     }
 
     public String getName() {
@@ -28,11 +36,19 @@ public class Cryptocurrency {
         this.shortname = shortname;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(double price) {
         this.price = price;
+    }
+
+    public double getVolume() {
+        return volume;
+    }
+
+    public void setVolume(double volume) {
+        this.volume = volume;
     }
 }

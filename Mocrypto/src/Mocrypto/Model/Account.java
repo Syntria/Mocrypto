@@ -4,6 +4,7 @@ public abstract class Account {
 
     private int id;
     private String name;
+    private String surname;
     private String username;
     private String password;
     private String type;
@@ -13,9 +14,10 @@ public abstract class Account {
     };
 
 
-    public Account(int id, String name, String username, String password, String type) {
+    public Account(int id, String name, String surname,String username, String password, String type) {
         this.id = id;
         this.name = name;
+        this.surname = surname;
         this.username = username;
         this.password = password;
         this.type = type;
@@ -36,6 +38,14 @@ public abstract class Account {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
     public String getUsername() {

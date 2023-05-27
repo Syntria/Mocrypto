@@ -1,6 +1,7 @@
 package Mocrypto.View;
 
 import Mocrypto.Helper.Config;
+import Mocrypto.Helper.CryptocurrencyAPI;
 import Mocrypto.Helper.Helper;
 import Mocrypto.Helper.SQLConnector;
 import Mocrypto.Model.Cryptocurrency;
@@ -8,6 +9,8 @@ import Mocrypto.Model.User;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -37,24 +40,68 @@ public class MainPage extends JFrame implements IPage{
     private JLabel lbl_mainpage_welcome;
     private JLabel lbl_mainpage_totalbalance;
     private JButton btn_logout;
+    private JButton btn_refresh;
 
     private DefaultTableModel model_course_list;
     private Object[] row_cryptocurrency_list;
 
 
-    private ArrayList<Cryptocurrency> cryptocurrencyList;
+    private ArrayList<Cryptocurrency> cryptocurrencyList = new ArrayList<>();
     private static User currentUser;
+    private CryptocurrencyAPI cryptocurrencyAPI = new CryptocurrencyAPI();
 
-    public MainPage(/*User user*/) {
+    public MainPage(User user) {
+
+        currentUser = user;
+
+        cryptocurrencyList = cryptocurrencyAPI.getCryptocurrencyList();
+
 
         display();
 
+        btn_refresh.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int count = 0;
+                for (Cryptocurrency cryptocurrency: cryptocurrencyList) {
+                    cryptocurrency.setPrice(cryptocurrencyAPI.getExchangeRate(cryptocurrency));
+
+                    System.out.println(cryptocurrency.getPrice());
+                    if (count == 5)
+                        break;
+
+                    count++;
+                }
+
+                loadCryptocurrencyModel(cryptocurrencyList);
+
+
+            }
+
+        });
+
+        tbl_crypto_list.getSelectionModel().addListSelectionListener(e -> {
+            try{
+                String selected_crypto_name = tbl_crypto_list.getValueAt(tbl_crypto_list.getSelectedRow(),1).toString();
+                fld_cryptobuy_name.setText(selected_crypto_name);
+            }catch (Exception exception){
+
+            }
+
+        });
+        btn_logout.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                LoginPage loginPage = new LoginPage();
+            }
+        });
     }
 
     @Override
     public void display() {
 
-        System.out.println("asd");
         add(wrapper);
         setSize(1000,500);
         int x= Helper.screenCenterPoint("x",getSize());
@@ -64,8 +111,11 @@ public class MainPage extends JFrame implements IPage{
         setTitle(Config.PROJECT_TITLE);
         setVisible(true);
 
+        lbl_mainpage_welcome.setText("Welcome: " + currentUser.getName() + " " +currentUser.getSurname());
+        lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getBalance() + " USD");
+
         model_course_list= new DefaultTableModel();
-        Object[] col_courseList= {"Name","Short", "Current Price"};
+        Object[] col_courseList= {"Name","Symbol", "Current Price"};
         model_course_list.setColumnIdentifiers(col_courseList);
         row_cryptocurrency_list = new Object[col_courseList.length];
         loadCryptocurrencyModel(cryptocurrencyList);
@@ -100,8 +150,8 @@ public class MainPage extends JFrame implements IPage{
                 String name = rs.getString("name");
                 String shortName = rs.getString("short_name");
                 int price = rs.getInt("price");
-                cryptocurrency = new Cryptocurrency(name, shortName, price);
-                cryptocurrencyList.add(cryptocurrency);
+                //cryptocurrency = new Cryptocurrency(name, shortName, price);
+                //cryptocurrencyList.add(cryptocurrency);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -111,8 +161,11 @@ public class MainPage extends JFrame implements IPage{
 
 
 
+
     public static void main(String[] args) {
+        User user = new User();
+
         Helper.setLayout();
-        MainPage main =new MainPage();
+        MainPage main =new MainPage(user);
     }
 }
