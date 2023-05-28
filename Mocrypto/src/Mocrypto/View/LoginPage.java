@@ -108,8 +108,8 @@ public class LoginPage extends JFrame implements IPage{
 
         String query = "DROP TABLE `account`;";
 
-        /*PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);
-        pr.execute();
+        PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);
+        /*pr.execute();
 
         query = "DROP TABLE `cryptocurrency`;";
 
