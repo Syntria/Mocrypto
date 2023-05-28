@@ -104,8 +104,51 @@ public class LoginPage extends JFrame implements IPage{
         return obj;
     }
 
+    private static void initializeDatabase () throws SQLException {
 
-    public static void main(String[] args) {
+        String query = "DROP TABLE `account`;";
+
+        /*PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);
+        pr.execute();
+
+        query = "DROP TABLE `cryptocurrency`;";
+
+        pr = SQLConnector.getInstance().prepareStatement(query);
+        pr.execute();*/
+
+         query="CREATE TABLE `account` (\n" +
+                "\t`id` INT NOT NULL AUTO_INCREMENT,\n" +
+                "\t`name` VARCHAR(255) NOT NULL,\n" +
+                "\t`surname` VARCHAR(255) NOT NULL,\n" +
+                "\t`username` VARCHAR(255) NOT NULL,\n" +
+                "\t`password` VARCHAR(255) NOT NULL,\n" +
+                "\t`balance` DOUBLE NOT NULL,\n" +
+                "\t`type` VARCHAR(255) NOT NULL,\n" +
+                "\tPRIMARY KEY (`id`)\n" +
+                ");";
+
+        pr = SQLConnector.getInstance().prepareStatement(query);
+        pr.execute();
+
+        query="CREATE TABLE `cryptocurrency` (\n" +
+                "\t`uuid` VARCHAR(255) NOT NULL,\n" +
+                "\t`name` VARCHAR(255) NOT NULL,\n" +
+                "\t`shortname` VARCHAR(255) NOT NULL,\n" +
+                "\t`price` DOUBLE NOT NULL,\n" +
+                "\t`volume` DOUBLE,\n" +
+                "\tPRIMARY KEY (`uuid`)\n" +
+                ");";
+
+        pr = SQLConnector.getInstance().prepareStatement(query);
+        pr.execute();
+
+    }
+
+
+    public static void main(String[] args) throws SQLException {
+
+        initializeDatabase();
+
         Helper.setLayout();
         LoginPage login=new LoginPage();
     }

@@ -55,7 +55,7 @@ public class MainPage extends JFrame implements IPage{
     public MainPage(User user) {
 
         currentUser = user;
-        
+
         display();
 
         btn_refresh.addActionListener(new ActionListener() {

@@ -65,7 +65,7 @@ public class RegisterPage extends JFrame implements IPage{
     }
 
     public static boolean add(String name,String surname,String username,String password){
-        String query="INSERT INTO account (name,surname,username,password,type) VALUES (?,?,?,?,10000,'user')";
+        String query="INSERT INTO account (name,surname,username,password,balance,type) VALUES (?,?,?,?,10000,'user')";
         Account findUser = RegisterPage.fetchAccount(username);
         if(findUser!=null){
             Helper.showMsg("This username is taken, please choose another username");
