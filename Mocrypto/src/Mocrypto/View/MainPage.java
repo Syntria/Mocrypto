@@ -70,6 +70,9 @@ public class MainPage extends JFrame implements IPage{
 
                     count++;
                 }
+                currentUser.setBalance(currentUser.getBalance());
+
+                lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getBalance() + " USD");
 
                 loadCryptocurrencyModel(cryptocurrencyList);
 
@@ -97,15 +100,12 @@ public class MainPage extends JFrame implements IPage{
         btn_crypto_buy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println(tbl_crypto_list.getSelectionModel());
                 Cryptocurrency selectedCoin = cryptocurrencyList.get(tbl_crypto_list.getSelectedRow());
                 Cryptocurrency baseCoin = cryptocurrencyList.get(0); // temporary --<vodka USDT
                 Exchange exchange = new Exchange(currentUser,selectedCoin,baseCoin);
                 double amount = Double.parseDouble(fld_cryptobuy_amount.getText());
                 exchange.buyCryptocurrency(amount,"BUY");
-
-
-
+                display();
             }
         });
     }

@@ -58,36 +58,45 @@ public class Exchange {
 
     public Transaction buyCryptocurrency(double baseCoinAmount, String type){
 
-        if(baseCoinAmount >= baseCryptocurrency.getAmount()) { // this line will be changed
-            System.out.println("!Sufficient Balance!");
+        System.out.println("initial target amount : " + targetCryptocurrency.getAmount());
+        System.out.println("initial base amount : " + baseCryptocurrency.getAmount());
+        Portfolio portfolio = user.getPortfolio();
 
-            Portfolio portfolio = user.getPortfolio();
+        System.out.println(baseCryptocurrency.getName());
+        int baseCoinIndex = getIndexOfCurrency(portfolio,baseCryptocurrency);
+        Cryptocurrency baseCryptocurrencyInPortfolio = portfolio.getCryptocurrencies().get(baseCoinIndex);
+        System.out.println("wanted amount : " + baseCoinAmount);
+        System.out.println("portfolio amount : " + baseCryptocurrencyInPortfolio.getAmount());
+
+        if(baseCoinAmount <= baseCryptocurrencyInPortfolio.getAmount()) { // If user has sufficient balance
+            System.out.println("!Sufficient Balance!");
 
             double targetCoinAmount = baseCoinAmount * 1/targetCryptocurrency.getPrice(); // Store the amount of the target coin
             // Add the target coin to the user portfolio
             portfolio = addCryptoCurrencyToPortfolio(portfolio,targetCoinAmount);
 
             // Decrease the amount of the base coin
-            Iterator<Cryptocurrency> iterator = portfolio.getCryptocurrencies().iterator();
-            int indexCounter = 0; // Store the index of the coin if occurs
-            while (iterator.hasNext()){ // Check if the target coin is already bought
-                Cryptocurrency check = iterator.next();
-                if (check.getShortname().equals(baseCryptocurrency.getShortname())){
-                    break;
-                }
-                indexCounter++;
-            }
-            System.out.println(baseCryptocurrency.getName());
-            Cryptocurrency cryptocurrency = portfolio.getCryptocurrencies().get(indexCounter);
-            double oldAmount = cryptocurrency.getAmount();
+            baseCryptocurrencyInPortfolio = portfolio.getCryptocurrencies().get(baseCoinIndex);
+            double oldAmount = baseCryptocurrencyInPortfolio.getAmount();
             if(baseCoinAmount == oldAmount){ // If all the balance of the base coin is spending
-                portfolio.getCryptocurrencies().remove(cryptocurrency); // remove the coin from the portfolio
+                portfolio.getCryptocurrencies().remove(baseCryptocurrencyInPortfolio); // remove the coin from the portfolio
             }
             else {
-                portfolio.getCryptocurrencies().get(indexCounter).setAmount(oldAmount-baseCoinAmount); // decrease the amount of the base coin
+                portfolio.getCryptocurrencies().get(baseCoinIndex).setAmount(oldAmount-baseCoinAmount); // decrease the amount of the base coin
             }
             // Update the user portfolio
             user.setPortfolio(portfolio);
+
+            System.out.println();
+            for(Cryptocurrency cryptocurrency : user.getPortfolio().getCryptocurrencies()){
+                System.out.println(cryptocurrency.getShortname() + " " + cryptocurrency.getAmount());
+            }
+            System.out.println();
+            System.out.println();
+            System.out.println();
+            System.out.println();
+
+
             // Create a transaction
             Transaction transaction = new Transaction(type,targetCoinAmount,targetCryptocurrency,baseCryptocurrency);
             return transaction;
@@ -98,4 +107,19 @@ public class Exchange {
             return null;
         }
      } // end buyCryptocurrency
+
+
+
+    private int getIndexOfCurrency (Portfolio portfolio, Cryptocurrency cryptocurrency){
+        Iterator<Cryptocurrency> iterator = portfolio.getCryptocurrencies().iterator();
+        int indexCounter = 0; // Store the index of the coin if occurs
+        while (iterator.hasNext()){ // Check if the target coin is already bought
+            Cryptocurrency check = iterator.next();
+            if (check.getShortname().equals(cryptocurrency.getShortname())){
+                break;
+            }
+            indexCounter++;
+        }
+        return indexCounter;
+    }
 }

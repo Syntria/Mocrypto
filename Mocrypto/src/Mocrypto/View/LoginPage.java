@@ -105,20 +105,23 @@ public class LoginPage extends JFrame implements IPage{
     }
 
     private static void initializeDatabase () throws SQLException {
-
+        /*
         String query = "DROP TABLE `account`;";
 
         PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);;
 
-        /*pr.execute();
+
+        pr.execute();
 
         query = "DROP TABLE `cryptocurrency`;";
 
         pr = SQLConnector.getInstance().prepareStatement(query);
-        pr.execute();*/
+        pr.execute();
+    */
+        /*
+        PreparedStatement pr;
+        String query;
 
-
-/*
          query="CREATE TABLE `account` (\n" +
                 "\t`id` INT NOT NULL AUTO_INCREMENT,\n" +
                 "\t`name` VARCHAR(255) NOT NULL,\n" +
@@ -132,6 +135,7 @@ public class LoginPage extends JFrame implements IPage{
 
         pr = SQLConnector.getInstance().prepareStatement(query);
         pr.execute();
+
 
         query="CREATE TABLE `cryptocurrency` (\n" +
                 "\t`uuid` VARCHAR(255) NOT NULL,\n" +
@@ -162,6 +166,7 @@ public class LoginPage extends JFrame implements IPage{
         pr.execute();
 
  */
+
     }
 
 

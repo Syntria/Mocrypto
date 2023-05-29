@@ -1,6 +1,9 @@
 package Mocrypto.Model;
 
+import Mocrypto.Helper.Helper;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Portfolio {
     private String name;
@@ -53,5 +56,19 @@ public class Portfolio {
 
     public void setCryptocurrencies(ArrayList<Cryptocurrency> cryptocurrencies) {
         this.cryptocurrencies = cryptocurrencies;
+    }
+
+
+    public double getAmountOfSpecificCoin(String shortName){
+        Iterator<Cryptocurrency> iterator = getCryptocurrencies().iterator();
+        int indexCounter = 0; // Store the index of the coin if occurs
+        while (iterator.hasNext()){ // Check if the target coin is already bought
+            Cryptocurrency check = iterator.next();
+            if (check.getShortname().equals(shortName)){
+                return check.getAmount();
+            }
+        }
+        Helper.showMsg("The currency isn't available in your portfolio!");
+        return 0.0;
     }
 }

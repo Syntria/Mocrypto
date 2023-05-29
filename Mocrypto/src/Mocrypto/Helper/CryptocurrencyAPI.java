@@ -142,7 +142,7 @@ public class CryptocurrencyAPI {
        double exchangeRate = -1.0;
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://coinranking1.p.rapidapi.com/coin/"+cryptocurrency.getUuid()+"/price?referenceCurrencyUuid=yhjMzLPhuIDl"))
+                    .uri(URI.create("https://coinranking1.p.rapidapi.com/coin/"+cryptocurrency.getUuid()+"/price?referenceCurrencyUuid=HIVsRcGKkPFtW"))
                     .header("X-RapidAPI-Key", "f4dc7b4755mshabeb5efe49cbb98p1ed3d1jsn997e6463d8b0")
                     .header("X-RapidAPI-Host", "coinranking1.p.rapidapi.com")
                     .method("GET", HttpRequest.BodyPublishers.noBody())
