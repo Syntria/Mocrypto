@@ -103,7 +103,7 @@ public class MainPage extends JFrame implements IPage{
             public void actionPerformed(ActionEvent e) {
 
                 // Adding user's cryptocurrencies to database
-                add(currentUser);
+                addDatabase(currentUser);
 
                 dispose();
                 LoginPage loginPage = new LoginPage();
@@ -118,7 +118,7 @@ public class MainPage extends JFrame implements IPage{
                 Cryptocurrency baseCoin = cryptocurrencyList.get(index); // temporary --<vodka USDT
                 Exchange exchange = new Exchange(currentUser,selectedCoin,baseCoin);
                 double amount = Double.parseDouble(fld_cryptobuy_amount.getText());
-                exchange.buyCryptocurrency(amount,"BUY");
+                addDatabase(exchange.buyCryptocurrency(amount,"BUY"));
                 display();
             }
         });
@@ -144,7 +144,7 @@ public class MainPage extends JFrame implements IPage{
                 Cryptocurrency baseCoin = currentUser.getPortfolio().getCryptocurrencies().get(index); // temporary --<vodka USDT
                 Exchange exchange = new Exchange(currentUser,baseCoin,selectedCoin);
                 double amount = Double.parseDouble(fld_cryptosell_amount.getText());
-                exchange.buyCryptocurrency(amount,"SELL");
+                addDatabase(exchange.buyCryptocurrency(amount,"SELL"));
                 display();
             }
         });
@@ -204,7 +204,7 @@ public class MainPage extends JFrame implements IPage{
         Object[] col_transactionList= {"Type","Base", "Target","Amount", "Date"};
         model_transaction_list.setColumnIdentifiers(col_transactionList);
         row_transaction_list = new Object[col_transactionList.length];
-        loadPortfolioModel(currentUser.getPortfolio().getCryptocurrencies()); //change after func
+        loadTransactionModel(getTransactions());
         tbl_transaction_list.setModel(model_transaction_list);
         tbl_transaction_list.getColumnModel().getColumn(0).setMaxWidth(75);
         tbl_transaction_list.getTableHeader().setReorderingAllowed(false);
@@ -259,7 +259,7 @@ public class MainPage extends JFrame implements IPage{
         return cryptocurrencyList;
     }
 
-    public static boolean add(int user_id,String crypto_id,String shortname,double buy_price, double amount){
+    public static boolean addDatabase(int user_id,String crypto_id,String shortname,double buy_price, double amount){
         String query="INSERT INTO owned_cryptocurrency (user_id,crypto_id,shortname,buy_price,amount) VALUES (?,?,?,?,?,?)";
 
         try {
@@ -324,7 +324,7 @@ public class MainPage extends JFrame implements IPage{
     }
 
     // Function for storing user portfolio
-    public static boolean add(User user) {
+    public static boolean addDatabase(User user) {
 
         String query = "DELETE FROM portfolio WHERE user_id = " + currentUser.getId();
 
@@ -386,6 +386,7 @@ public class MainPage extends JFrame implements IPage{
             model_transaction_list.addRow(row_transaction_list);
         }
     }
+
     private static ArrayList<Transaction> getTransactions() {
 
         ArrayList<Transaction> transactionsList =new ArrayList<>();
@@ -412,6 +413,34 @@ public class MainPage extends JFrame implements IPage{
         return transactionsList;
 
     }
+
+    public static boolean addDatabase(Transaction transaction){
+        String query="INSERT INTO transaction (user_id,type,amount,base_crypto,target_crypto,time_stamp) VALUES (?,?,?,?,?,?)";
+
+        try {
+            PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);
+            pr.setInt(1,currentUser.getId());
+            pr.setString(2,transaction.getType());
+            pr.setDouble(3,transaction.getAmount());
+            pr.setString(4,transaction.getBaseCryptocurrency());
+            pr.setString(5,transaction.getTargetCryptocurrency());
+            pr.setString(6,transaction.getTimestamp());
+            int response= pr.executeUpdate();
+
+            if(response == -1){
+                Helper.showMsg("error");
+            }
+            return response != -1;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return true;
+    }
+
+
+
 
 
 
