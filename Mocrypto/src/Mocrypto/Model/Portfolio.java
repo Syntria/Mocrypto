@@ -68,7 +68,7 @@ public class Portfolio {
                 return check.getAmount();
             }
         }
-        Helper.showMsg("The currency isn't available in your portfolio!");
+        //Helper.showMsg("The currency isn't available in your portfolio!");
         return 0.0;
     }
 }

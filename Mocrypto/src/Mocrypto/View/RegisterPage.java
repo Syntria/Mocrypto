@@ -4,6 +4,7 @@ import Mocrypto.Helper.Config;
 import Mocrypto.Helper.Helper;
 import Mocrypto.Helper.SQLConnector;
 import Mocrypto.Model.Account;
+import Mocrypto.Model.Cryptocurrency;
 import Mocrypto.Model.User;
 
 import javax.swing.*;
@@ -12,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class RegisterPage extends JFrame implements IPage{
     private JPanel pnl_user_register;
@@ -52,10 +54,11 @@ public class RegisterPage extends JFrame implements IPage{
                     String username=fld_user_username.getText();
                     String pass=fld_user_password.getText();
                     if(add(name,surname,username,pass)){
+                        System.out.println("searched username : " + username);
+                        add(username); // Initialize the user portfolio (added to the database)
                         Helper.showMsg("done");
                         dispose();
                         LoginPage loginPage = new LoginPage();
-
                     }
                 }
 
@@ -90,6 +93,53 @@ public class RegisterPage extends JFrame implements IPage{
 
         return true;
     }
+
+
+
+
+    public boolean add (String searchedUsername){
+
+         String query="INSERT INTO portfolio (user_id,uuid,short_name,name,amount) VALUES (?,?,?,?,?)";
+         String query2="SELECT * FROM account WHERE username =?";
+
+         try {
+             Cryptocurrency cryptocurrency = new Cryptocurrency("HIVsRcGKkPFtW","Tether USD","USDT",1.0,18942563028.0);
+             cryptocurrency.setAmount(10000);
+
+             PreparedStatement pr2 = SQLConnector.getInstance().prepareStatement(query2);
+
+             pr2.setString(1,searchedUsername);
+             ResultSet rs=pr2.executeQuery();
+
+             int userID = -1;
+
+             if (rs.getString("username").equals(searchedUsername)) {
+                 userID = rs.getInt("id");
+             }
+
+             PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);
+
+             pr.setInt(1, userID);
+             pr.setString(2,cryptocurrency.getUuid());
+             pr.setString(3,cryptocurrency.getShortname());
+             pr.setString(4,cryptocurrency.getName());
+             pr.setDouble(5,cryptocurrency.getAmount());
+             int response= pr.executeUpdate();
+
+             if(response == -1){
+                 Helper.showMsg("error");
+             }
+             return response != -1;
+
+         } catch (SQLException e) {
+             System.out.println(e.getMessage());
+             Helper.showMsg(e.getMessage());
+         }
+
+        return true;
+    }
+
+
 
     public static Account fetchAccount(String username){
         Account obj=null;

@@ -64,6 +64,10 @@ public class Exchange {
 
         System.out.println(baseCryptocurrency.getName());
         int baseCoinIndex = getIndexOfCurrency(portfolio,baseCryptocurrency);
+        if(baseCoinIndex == user.getPortfolio().getCryptocurrencies().size()){
+            Helper.showMsg(baseCryptocurrency.getShortname() + " isn't available in your portfolio!");
+            return null;
+        }
         Cryptocurrency baseCryptocurrencyInPortfolio = portfolio.getCryptocurrencies().get(baseCoinIndex);
         System.out.println("wanted amount : " + baseCoinAmount);
         System.out.println("portfolio amount : " + baseCryptocurrencyInPortfolio.getAmount());

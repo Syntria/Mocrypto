@@ -199,10 +199,16 @@ public class MainPage extends JFrame implements IPage{
     }
 
 
+    public void addPortfolioToDatabase (){
 
+    }
 
     public static void main(String[] args) {
         User user = new User();
+
+        if(user.getPortfolio().getCryptocurrencies() == null){
+
+        }
 
         Helper.setLayout();
         MainPage main =new MainPage(user);
