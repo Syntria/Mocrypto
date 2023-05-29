@@ -108,7 +108,8 @@ public class LoginPage extends JFrame implements IPage{
 
         String query = "DROP TABLE `account`;";
 
-        PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);
+        PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);;
+
         /*pr.execute();
 
         query = "DROP TABLE `cryptocurrency`;";
@@ -116,6 +117,8 @@ public class LoginPage extends JFrame implements IPage{
         pr = SQLConnector.getInstance().prepareStatement(query);
         pr.execute();*/
 
+
+/*
          query="CREATE TABLE `account` (\n" +
                 "\t`id` INT NOT NULL AUTO_INCREMENT,\n" +
                 "\t`name` VARCHAR(255) NOT NULL,\n" +
@@ -142,7 +145,26 @@ public class LoginPage extends JFrame implements IPage{
         pr = SQLConnector.getInstance().prepareStatement(query);
         pr.execute();
 
+
+
+        query="CREATE TABLE `transaction` (\n" +
+                "\t`id` INT NOT NULL AUTO_INCREMENT,\n" +
+                "\t`type` VARCHAR(4) NOT NULL,\n" +
+                "\t`amount` DOUBLE NOT NULL,\n" +
+                "\t`bought_coin` VARCHAR(255) NOT NULL,\n" +
+                "\t`sold_coin` VARCHAR(255) NOT NULL,\n" +
+                "\t`time_stamp` DOUBLE NOT NULL,\n" +
+                "\t`recipient_address` VARCHAR(255) NOT NULL,\n" +
+                "\tPRIMARY KEY (`id`)\n" +
+                ");";
+
+        pr = SQLConnector.getInstance().prepareStatement(query);
+        pr.execute();
+
+ */
     }
+
+
 
 
     public static void main(String[] args) throws SQLException {

@@ -7,6 +7,7 @@ public class Cryptocurrency {
     private String shortname;
     private double price;
     private double volume;
+    private double amount;
 
     public Cryptocurrency(String uuid, String name, String shortname, double price,double volume) {
         this.uuid = uuid;
@@ -14,6 +15,7 @@ public class Cryptocurrency {
         this.shortname = shortname;
         this.price = price;
         this.volume = volume;
+        this.amount = 0;
     }
 
     public String getUuid() {
@@ -50,5 +52,17 @@ public class Cryptocurrency {
 
     public void setVolume(double volume) {
         this.volume = volume;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public void addAmount(double amount){
+        this.amount = getAmount() + amount;
     }
 }

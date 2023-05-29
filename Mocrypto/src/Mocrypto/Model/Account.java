@@ -8,6 +8,8 @@ public abstract class Account {
     private String username;
     private String password;
     private String type;
+    private Portfolio portfolio;
+
 
     public Account(){
 
@@ -21,6 +23,8 @@ public abstract class Account {
         this.username = username;
         this.password = password;
         this.type = type;
+        this.portfolio = new Portfolio();
+        this.portfolio.setId(getId());
     }
 
 
@@ -70,5 +74,13 @@ public abstract class Account {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Portfolio getPortfolio() {
+        return portfolio;
+    }
+
+    public void setPortfolio(Portfolio portfolio) {
+        this.portfolio = portfolio;
     }
 }
