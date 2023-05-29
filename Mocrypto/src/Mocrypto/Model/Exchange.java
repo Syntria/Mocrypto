@@ -1,6 +1,8 @@
 package Mocrypto.Model;
 
+import Mocrypto.Helper.CryptocurrencyAPI;
 import Mocrypto.Helper.Helper;
+import Mocrypto.View.MainPage;
 
 import javax.sound.sampled.Port;
 import java.util.ArrayList;
@@ -74,8 +76,8 @@ public class Exchange {
 
         if(baseCoinAmount <= baseCryptocurrencyInPortfolio.getAmount()) { // If user has sufficient balance
             System.out.println("!Sufficient Balance!");
-
-            double targetCoinAmount = baseCoinAmount * 1/targetCryptocurrency.getPrice(); // Store the amount of the target coin
+            CryptocurrencyAPI API = new CryptocurrencyAPI();
+            double targetCoinAmount = baseCoinAmount * 1/API.getExchangeRate(targetCryptocurrency,baseCryptocurrency); // Store the amount of the target coin
             // Add the target coin to the user portfolio
             portfolio = addCryptoCurrencyToPortfolio(portfolio,targetCoinAmount);
 

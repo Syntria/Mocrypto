@@ -32,6 +32,7 @@ public class MainPage extends JFrame implements IPage{
     private JTextField fld_cryptobuy_name;
     private JTextField fld_cryptobuy_amount;
     private JButton btn_crypto_buy;
+    private JComboBox combo_box_currencies;
     private JPanel pnl_portfolio;
     private JPanel pnl_crypto_sell;
     private JScrollPane scrl_portfolio_list;
@@ -47,16 +48,18 @@ public class MainPage extends JFrame implements IPage{
     private JButton btn_logout;
     private JButton btn_refresh;
 
+    private DefaultComboBoxModel comboBoxModel;
     private DefaultTableModel model_crypto_list;
     private Object[] row_cryptocurrency_list;
 
     private DefaultTableModel model_portfolio_list;
     private Object[] row_portfolio_list;
 
+    private Object[] row_base_coin_list;
 
     private ArrayList<Cryptocurrency> cryptocurrencyList = new ArrayList<>();
     private static User currentUser;
-    private CryptocurrencyAPI cryptocurrencyAPI = new CryptocurrencyAPI();
+    private static CryptocurrencyAPI cryptocurrencyAPI = new CryptocurrencyAPI();
 
     public MainPage(User user) {
 
@@ -83,8 +86,6 @@ public class MainPage extends JFrame implements IPage{
                 lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getBalance() + " USD");
 
                 loadCryptocurrencyModel(cryptocurrencyList);
-
-
             }
 
         });
@@ -130,6 +131,25 @@ public class MainPage extends JFrame implements IPage{
             }
 
         });
+
+
+
+        btn_crypto_sell.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Cryptocurrency selectedCoin = currentUser.getPortfolio().getCryptocurrencies().get(tbl_portfolio_list.getSelectedRow());
+                Cryptocurrency baseCoin = currentUser.getPortfolio().getCryptocurrencies().get(0); // temporary --<vodka USDT
+                Exchange exchange = new Exchange(currentUser,baseCoin,selectedCoin);
+                double amount = Double.parseDouble(fld_cryptosell_amount.getText());
+                exchange.buyCryptocurrency(amount,"SELL");
+                display();
+            }
+        });
+
+
+
+
+
     }
 
     @Override
@@ -149,6 +169,12 @@ public class MainPage extends JFrame implements IPage{
 
         lbl_mainpage_welcome.setText("Welcome: " + currentUser.getName() + " " + currentUser.getSurname());
         lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getBalance() + " USD");
+
+
+        comboBoxModel = new DefaultComboBoxModel<>();
+        combo_box_currencies.setModel(comboBoxModel);
+        loadBaseCoinListModel(currentUser.getPortfolio().getCryptocurrencies());
+
 
         model_crypto_list = new DefaultTableModel();
         Object[] col_cryptoList= {"Name","Symbol", "Current Price"};
@@ -181,6 +207,18 @@ public class MainPage extends JFrame implements IPage{
             row_cryptocurrency_list[i++]=obj.getShortname();
             row_cryptocurrency_list[i++]=obj.getPrice();
             model_crypto_list.addRow(row_cryptocurrency_list);
+        }
+    }
+
+
+    private void loadBaseCoinListModel(ArrayList<Cryptocurrency> cryptocurrencyList) {
+        DefaultComboBoxModel clearModel=(DefaultComboBoxModel) combo_box_currencies.getModel();
+
+        int i=0;
+        for(Cryptocurrency obj: cryptocurrencyList){
+            i=0;
+            String shortName = obj.getShortname();
+            combo_box_currencies.addItem(shortName);
         }
     }
 
@@ -260,6 +298,8 @@ public class MainPage extends JFrame implements IPage{
                 String name = rs.getString("name");
                 double amount = rs.getDouble("amount");
                 cryptocurrency = new Cryptocurrency(uuid, name, shortName, amount);
+
+                cryptocurrency.setPrice(cryptocurrencyAPI.getExchangeRate(cryptocurrency));
                 cryptocurrencyList.add(cryptocurrency);
             }
         } catch (SQLException e) {
