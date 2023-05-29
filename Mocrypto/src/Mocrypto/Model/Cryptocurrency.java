@@ -9,6 +9,13 @@ public class Cryptocurrency {
     private double volume;
     private double amount;
 
+    public Cryptocurrency(String uuid, String name, String shortname, double amount) {
+        this.uuid = uuid;
+        this.name = name;
+        this.shortname = shortname;
+        this.amount = amount;
+    }
+
     public Cryptocurrency(String uuid, String name, String shortname, double price,double volume) {
         this.uuid = uuid;
         this.name = name;

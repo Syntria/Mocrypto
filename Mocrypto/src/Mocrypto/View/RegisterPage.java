@@ -109,14 +109,17 @@ public class RegisterPage extends JFrame implements IPage{
              PreparedStatement pr2 = SQLConnector.getInstance().prepareStatement(query2);
 
              pr2.setString(1,searchedUsername);
+
+
              ResultSet rs=pr2.executeQuery();
 
              int userID = -1;
 
-             if (rs.getString("username").equals(searchedUsername)) {
-                 userID = rs.getInt("id");
+             if (rs.next()) {
+                 if (rs.getString("username").equals(searchedUsername)) {
+                     userID = rs.getInt("id");
+                 }
              }
-
              PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);
 
              pr.setInt(1, userID);
@@ -129,6 +132,8 @@ public class RegisterPage extends JFrame implements IPage{
              if(response == -1){
                  Helper.showMsg("error");
              }
+             else
+                 Helper.showMsg("Added to the database");
              return response != -1;
 
          } catch (SQLException e) {

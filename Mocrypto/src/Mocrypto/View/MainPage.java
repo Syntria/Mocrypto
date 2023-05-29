@@ -6,10 +6,15 @@ import Mocrypto.Helper.Helper;
 import Mocrypto.Helper.SQLConnector;
 import Mocrypto.Model.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.io.File;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,6 +50,9 @@ public class MainPage extends JFrame implements IPage{
     private DefaultTableModel model_crypto_list;
     private Object[] row_cryptocurrency_list;
 
+    private DefaultTableModel model_portfolio_list;
+    private Object[] row_portfolio_list;
+
 
     private ArrayList<Cryptocurrency> cryptocurrencyList = new ArrayList<>();
     private static User currentUser;
@@ -54,22 +62,22 @@ public class MainPage extends JFrame implements IPage{
 
         currentUser = user;
 
+        currentUser.setPortfolio(new Portfolio());
+
+        currentUser.getPortfolio().setCryptocurrencies(getPortfolio());
+
         display();
 
         btn_refresh.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                int count = 0;
                 for (Cryptocurrency cryptocurrency: cryptocurrencyList) {
                     cryptocurrency.setPrice(cryptocurrencyAPI.getExchangeRate(cryptocurrency));
 
                     System.out.println(cryptocurrency.getPrice());
-                    if (count == 5)
-                        break;
-
-                    count++;
                 }
+
                 currentUser.setBalance(currentUser.getBalance());
 
                 lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getBalance() + " USD");
@@ -93,6 +101,10 @@ public class MainPage extends JFrame implements IPage{
         btn_logout.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                // Adding user's cryptocurrencies to database
+                add(currentUser);
+
                 dispose();
                 LoginPage loginPage = new LoginPage();
             }
@@ -108,6 +120,16 @@ public class MainPage extends JFrame implements IPage{
                 display();
             }
         });
+
+        tbl_portfolio_list.getSelectionModel().addListSelectionListener(e -> {
+            try{
+                String selected_crypto_name = tbl_portfolio_list.getValueAt(tbl_portfolio_list.getSelectedRow(),1).toString();
+                fld_cryptosell_name.setText(selected_crypto_name);
+            }catch (Exception exception){
+
+            }
+
+        });
     }
 
     @Override
@@ -118,23 +140,34 @@ public class MainPage extends JFrame implements IPage{
         int x= Helper.screenCenterPoint("x",getSize());
         int y=Helper.screenCenterPoint("y",getSize());
         setLocation(x,y);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setTitle(Config.PROJECT_TITLE);
         setVisible(true);
 
         cryptocurrencyList = getCryptocurrencyList();
 
-        lbl_mainpage_welcome.setText("Welcome: " + currentUser.getName() + " " +currentUser.getSurname());
+
+        lbl_mainpage_welcome.setText("Welcome: " + currentUser.getName() + " " + currentUser.getSurname());
         lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getBalance() + " USD");
 
         model_crypto_list = new DefaultTableModel();
-        Object[] col_courseList= {"Name","Symbol", "Current Price"};
-        model_crypto_list.setColumnIdentifiers(col_courseList);
-        row_cryptocurrency_list = new Object[col_courseList.length];
+        Object[] col_cryptoList= {"Name","Symbol", "Current Price"};
+        model_crypto_list.setColumnIdentifiers(col_cryptoList);
+        row_cryptocurrency_list = new Object[col_cryptoList.length];
         loadCryptocurrencyModel(cryptocurrencyList);
         tbl_crypto_list.setModel(model_crypto_list);
         tbl_crypto_list.getColumnModel().getColumn(0).setMaxWidth(75);
         tbl_crypto_list.getTableHeader().setReorderingAllowed(false);
+
+
+        model_portfolio_list = new DefaultTableModel();
+        Object[] col_portfolioList= {"Name","Symbol", "Amount","Current Price"};
+        model_portfolio_list.setColumnIdentifiers(col_portfolioList);
+        row_portfolio_list = new Object[col_portfolioList.length];
+        loadPortfolioModel(currentUser.getPortfolio().getCryptocurrencies());
+        tbl_portfolio_list.setModel(model_portfolio_list);
+        tbl_portfolio_list.getColumnModel().getColumn(0).setMaxWidth(75);
+        tbl_portfolio_list.getTableHeader().setReorderingAllowed(false);
     }
 
 
@@ -198,17 +231,96 @@ public class MainPage extends JFrame implements IPage{
         return true;
     }
 
+    private void loadPortfolioModel(ArrayList<Cryptocurrency> portfolioCryptocurrencyList) {
+        DefaultTableModel clearModel=(DefaultTableModel) tbl_portfolio_list.getModel();
+        clearModel.setRowCount(0);
+        int i=0;
+        for(Cryptocurrency obj: portfolioCryptocurrencyList){
+            i=0;
+            row_portfolio_list[i++] = obj.getName();
+            row_portfolio_list[i++] = obj.getShortname();
+            row_portfolio_list[i++] = obj.getAmount();
+            row_portfolio_list[i++] = obj.getPrice();
+            model_portfolio_list.addRow(row_portfolio_list);
+        }
+    }
 
-    public void addPortfolioToDatabase (){
+    private static ArrayList<Cryptocurrency> getPortfolio() {
+
+        ArrayList<Cryptocurrency> cryptocurrencyList =new ArrayList<>();
+
+        Cryptocurrency cryptocurrency;
+        try {
+            Statement st= SQLConnector.getInstance().createStatement();
+            ResultSet rs=st.executeQuery("SELECT * from portfolio WHERE user_id = " + currentUser.getId());
+            while (rs.next()){
+
+                String uuid = rs.getString("uuid");
+                String shortName = rs.getString("short_name");
+                String name = rs.getString("name");
+                double amount = rs.getDouble("amount");
+                cryptocurrency = new Cryptocurrency(uuid, name, shortName, amount);
+                cryptocurrencyList.add(cryptocurrency);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return cryptocurrencyList;
 
     }
 
+    // Function for storing user portfolio
+    public static boolean add(User user) {
+
+        String query = "DELETE FROM portfolio WHERE user_id = " + currentUser.getId();
+
+        try {
+            PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);
+            int response= pr.executeUpdate();
+
+            if(response == -1){
+                Helper.showMsg("error");
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        for (Cryptocurrency cryptocurrency : user.getPortfolio().getCryptocurrencies()) {
+            System.out.println(cryptocurrency.getShortname());
+            query="INSERT INTO portfolio (user_id,uuid,short_name,name,amount) VALUES (?,?,?,?,?)";
+
+            try {
+                PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);
+                pr.setInt(1, user.getId());
+                pr.setString(2,cryptocurrency.getUuid());
+                pr.setString(3,cryptocurrency.getShortname());
+                pr.setString(4,cryptocurrency.getName());
+                pr.setDouble(5,cryptocurrency.getAmount());
+                int response= pr.executeUpdate();
+
+                if(response == -1){
+                    Helper.showMsg("error");
+                    return false;
+                }
+
+
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+
+        return true;
+
+    }
+
+
+
+
+
     public static void main(String[] args) {
         User user = new User();
-
-        if(user.getPortfolio().getCryptocurrencies() == null){
-
-        }
 
         Helper.setLayout();
         MainPage main =new MainPage(user);
