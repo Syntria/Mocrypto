@@ -6,15 +6,10 @@ import Mocrypto.Helper.Helper;
 import Mocrypto.Helper.SQLConnector;
 import Mocrypto.Model.*;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.io.File;
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,6 +28,7 @@ public class MainPage extends JFrame implements IPage{
     private JTextField fld_cryptobuy_amount;
     private JButton btn_crypto_buy;
     private JComboBox combo_box_currencies;
+    private JComboBox combo_box_portfolio;
     private JPanel pnl_portfolio;
     private JPanel pnl_crypto_sell;
     private JScrollPane scrl_portfolio_list;
@@ -48,13 +44,16 @@ public class MainPage extends JFrame implements IPage{
     private JButton btn_logout;
     private JButton btn_refresh;
 
-    private DefaultComboBoxModel comboBoxModel;
+    private DefaultComboBoxModel comboBoxModelForCoinList;
+    private DefaultComboBoxModel comboBoxModelForPortfolio;
     private DefaultTableModel model_crypto_list;
     private Object[] row_cryptocurrency_list;
 
     private DefaultTableModel model_portfolio_list;
     private Object[] row_portfolio_list;
 
+    private DefaultTableModel model_transaction_list;
+    private Object[] row_transaction_list;
     private Object[] row_base_coin_list;
 
     private ArrayList<Cryptocurrency> cryptocurrencyList = new ArrayList<>();
@@ -114,7 +113,9 @@ public class MainPage extends JFrame implements IPage{
             @Override
             public void actionPerformed(ActionEvent e) {
                 Cryptocurrency selectedCoin = cryptocurrencyList.get(tbl_crypto_list.getSelectedRow());
-                Cryptocurrency baseCoin = cryptocurrencyList.get(0); // temporary --<vodka USDT
+                String shortName = (String) combo_box_currencies.getSelectedItem();
+                int index = Exchange.getIndexOfCurrency(currentUser.getPortfolio(),shortName);
+                Cryptocurrency baseCoin = cryptocurrencyList.get(index); // temporary --<vodka USDT
                 Exchange exchange = new Exchange(currentUser,selectedCoin,baseCoin);
                 double amount = Double.parseDouble(fld_cryptobuy_amount.getText());
                 exchange.buyCryptocurrency(amount,"BUY");
@@ -138,17 +139,15 @@ public class MainPage extends JFrame implements IPage{
             @Override
             public void actionPerformed(ActionEvent e) {
                 Cryptocurrency selectedCoin = currentUser.getPortfolio().getCryptocurrencies().get(tbl_portfolio_list.getSelectedRow());
-                Cryptocurrency baseCoin = currentUser.getPortfolio().getCryptocurrencies().get(0); // temporary --<vodka USDT
+                String shortName = (String) combo_box_portfolio.getSelectedItem();
+                int index = Exchange.getIndexOfCurrency(currentUser.getPortfolio(),shortName);
+                Cryptocurrency baseCoin = currentUser.getPortfolio().getCryptocurrencies().get(index); // temporary --<vodka USDT
                 Exchange exchange = new Exchange(currentUser,baseCoin,selectedCoin);
                 double amount = Double.parseDouble(fld_cryptosell_amount.getText());
                 exchange.buyCryptocurrency(amount,"SELL");
                 display();
             }
         });
-
-
-
-
 
     }
 
@@ -171,9 +170,14 @@ public class MainPage extends JFrame implements IPage{
         lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getBalance() + " USD");
 
 
-        comboBoxModel = new DefaultComboBoxModel<>();
-        combo_box_currencies.setModel(comboBoxModel);
-        loadBaseCoinListModel(currentUser.getPortfolio().getCryptocurrencies());
+        comboBoxModelForCoinList = new DefaultComboBoxModel<>();
+        combo_box_currencies.setModel(comboBoxModelForCoinList);
+        loadBaseCoinListModel(currentUser.getPortfolio().getCryptocurrencies(),combo_box_currencies);
+
+        comboBoxModelForPortfolio = new DefaultComboBoxModel<>();
+        combo_box_portfolio.setModel(comboBoxModelForPortfolio);
+        loadBaseCoinListModel(currentUser.getPortfolio().getCryptocurrencies(),combo_box_portfolio);
+
 
 
         model_crypto_list = new DefaultTableModel();
@@ -194,6 +198,16 @@ public class MainPage extends JFrame implements IPage{
         tbl_portfolio_list.setModel(model_portfolio_list);
         tbl_portfolio_list.getColumnModel().getColumn(0).setMaxWidth(75);
         tbl_portfolio_list.getTableHeader().setReorderingAllowed(false);
+
+
+        model_transaction_list = new DefaultTableModel();
+        Object[] col_transactionList= {"Type","Base", "Target","Amount", "Date"};
+        model_transaction_list.setColumnIdentifiers(col_transactionList);
+        row_transaction_list = new Object[col_transactionList.length];
+        loadPortfolioModel(currentUser.getPortfolio().getCryptocurrencies()); //change after func
+        tbl_transaction_list.setModel(model_transaction_list);
+        tbl_transaction_list.getColumnModel().getColumn(0).setMaxWidth(75);
+        tbl_transaction_list.getTableHeader().setReorderingAllowed(false);
     }
 
 
@@ -211,14 +225,14 @@ public class MainPage extends JFrame implements IPage{
     }
 
 
-    private void loadBaseCoinListModel(ArrayList<Cryptocurrency> cryptocurrencyList) {
+    private void loadBaseCoinListModel(ArrayList<Cryptocurrency> cryptocurrencyList, JComboBox comboBox) {
         DefaultComboBoxModel clearModel=(DefaultComboBoxModel) combo_box_currencies.getModel();
 
         int i=0;
         for(Cryptocurrency obj: cryptocurrencyList){
             i=0;
             String shortName = obj.getShortname();
-            combo_box_currencies.addItem(shortName);
+            comboBox.addItem(shortName);
         }
     }
 
@@ -356,6 +370,48 @@ public class MainPage extends JFrame implements IPage{
     }
 
 
+    private void loadTransactionModel(ArrayList<Transaction> transactionList) {
+        DefaultTableModel clearModel=(DefaultTableModel) tbl_transaction_list.getModel();
+        clearModel.setRowCount(0);
+        int i=0;
+        for(Transaction obj: transactionList){
+            i=0;
+            row_transaction_list[i++] = obj.getType();
+            row_transaction_list[i++] = obj.getBaseCryptocurrency();
+            row_transaction_list[i++] = obj.getTargetCryptocurrency();
+            row_transaction_list[i++] = obj.getAmount();
+            row_transaction_list[i++] = obj.getTimestamp()
+
+            ;
+            model_transaction_list.addRow(row_transaction_list);
+        }
+    }
+    private static ArrayList<Transaction> getTransactions() {
+
+        ArrayList<Transaction> transactionsList =new ArrayList<>();
+
+        Transaction transaction;
+        try {
+            Statement st= SQLConnector.getInstance().createStatement();
+            ResultSet rs=st.executeQuery("SELECT * from transaction WHERE user_id = " + currentUser.getId());
+            while (rs.next()){
+
+                String type = rs.getString("type");
+                double amount = rs.getDouble("amount");
+                String base_crypto = rs.getString("base_crypto");
+                String target_crypto = rs.getString("target_crypto");
+                String time_stamp = rs.getString("time_stamp");
+
+                transaction = new Transaction(type, amount, target_crypto, base_crypto,time_stamp);
+
+                transactionsList.add(transaction);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return transactionsList;
+
+    }
 
 
 

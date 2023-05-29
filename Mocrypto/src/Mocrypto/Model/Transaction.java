@@ -4,22 +4,29 @@ import java.time.Instant;
 
 public class Transaction {
     private String type;
-    private int id;
     private double amount;
     private String timestamp;
-    private Cryptocurrency targetCryptocurrency;
-    private Cryptocurrency baseCryptocurrency;
-    private int recipientAddress;
+    private String targetCryptocurrency;
+    private String baseCryptocurrency;
 
 
 
     public Transaction(String type, double amount,
-                       Cryptocurrency targetCryptocurrency, Cryptocurrency baseCryptocurrency){
+                       String targetCryptocurrency, String baseCryptocurrency){
         this.type = type;
         this.amount = amount;
         this.targetCryptocurrency = targetCryptocurrency;
         this.baseCryptocurrency = baseCryptocurrency;
         this.timestamp = Instant.now().toString();
+    }
+
+    public Transaction(String type, double amount,
+                       String targetCryptocurrency, String baseCryptocurrency, String timestamp){
+        this.type = type;
+        this.amount = amount;
+        this.targetCryptocurrency = targetCryptocurrency;
+        this.baseCryptocurrency = baseCryptocurrency;
+        this.timestamp = timestamp;
     }
 
 
@@ -29,14 +36,6 @@ public class Transaction {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public double getAmount() {
@@ -55,26 +54,21 @@ public class Transaction {
         this.timestamp = timestamp;
     }
 
-    public Cryptocurrency getTargetCryptocurrency() {
+    public String  getTargetCryptocurrency() {
         return targetCryptocurrency;
     }
 
-    public void setTargetCryptocurrency(Cryptocurrency targetCryptocurrency) {
+    public void setTargetCryptocurrency(String targetCryptocurrency) {
         this.targetCryptocurrency = targetCryptocurrency;
     }
 
-    public Cryptocurrency getBaseCryptocurrency() {
+    public String getBaseCryptocurrency() {
         return baseCryptocurrency;
     }
 
-    public void setBaseCryptocurrency(Cryptocurrency baseCryptocurrency) {
+    public void setBaseCryptocurrency(String baseCryptocurrency) {
         this.baseCryptocurrency = baseCryptocurrency;
     }
-    public int getRecipientAddress() {
-        return recipientAddress;
-    }
 
-    public void setRecipientAddress(int recipientAddress) {
-        this.recipientAddress = recipientAddress;
-    }
+
 }
