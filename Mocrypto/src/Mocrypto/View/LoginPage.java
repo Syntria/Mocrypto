@@ -39,6 +39,8 @@ public class LoginPage extends JFrame implements IPage{
 
     @Override
     public void display() {
+
+        // Arranging page display properties
         add(wrapper);
         setSize(400,500);
         setLocation(Helper.screenCenterPoint("x",getSize()),Helper.screenCenterPoint("y",getSize()));
@@ -47,6 +49,7 @@ public class LoginPage extends JFrame implements IPage{
         setResizable(false);
         setVisible(true);
 
+        // Opening page corresponding to account type
         btn_login.addActionListener(e -> {
             if(Helper.isFieldEmpty(fld_user_uname) || Helper.isFieldEmpty(fld_user_pass)){
                 Helper.showMsg("fill");
@@ -70,6 +73,7 @@ public class LoginPage extends JFrame implements IPage{
         });
     }
 
+    // Retrieving account from database with respect to specified username and password
     public static Account fetchAccount(String username,String pass){
         Account obj=null;
         String query="SELECT * FROM account WHERE username=? AND password=?";
@@ -104,8 +108,9 @@ public class LoginPage extends JFrame implements IPage{
         return obj;
     }
 
+    // Creating necessary tables in MySQL database
     private static void initializeDatabase () throws SQLException {
-        /*
+
         String query = "DROP TABLE `account`;";
 
         PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);;
@@ -117,10 +122,6 @@ public class LoginPage extends JFrame implements IPage{
 
         pr = SQLConnector.getInstance().prepareStatement(query);
         pr.execute();
-    */
-        /*
-        PreparedStatement pr;
-        String query;
 
          query="CREATE TABLE `account` (\n" +
                 "\t`id` INT NOT NULL AUTO_INCREMENT,\n" +
@@ -165,7 +166,11 @@ public class LoginPage extends JFrame implements IPage{
         pr = SQLConnector.getInstance().prepareStatement(query);
         pr.execute();
 
- */
+
+        query = "CREATE TABLE transaction (user_id INT NOT NULL, type VARCHAR(255) NOT NULL, amount DOUBLE NOT NULL, base_crypto VARCHAR(255) NOT NULL, target_crypto VARCHAR(255) NOT NULL, time_stamp VARCHAR(255) NOT NULL);";
+
+        pr = SQLConnector.getInstance().prepareStatement(query);
+        pr.execute();
 
     }
 
@@ -174,7 +179,7 @@ public class LoginPage extends JFrame implements IPage{
 
     public static void main(String[] args) throws SQLException {
 
-        initializeDatabase();
+        //initializeDatabase();
 
         Helper.setLayout();
         LoginPage login=new LoginPage();

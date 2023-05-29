@@ -74,6 +74,7 @@ public class AdminPage extends JFrame implements IPage{
 
     public void display() {
 
+        // Arranging page display properties
         add(wrapper);
         setSize(1000,500);
         int x= Helper.screenCenterPoint("x",getSize());
@@ -188,6 +189,7 @@ public class AdminPage extends JFrame implements IPage{
         }
     }
 
+    // Function for displaying system's cryptocurrencies
     private void loadSystemCryptocurrencyModel(ArrayList<Cryptocurrency> systemCryptocurrencyList) {
 
         DefaultTableModel clearModel=(DefaultTableModel) table_systemcrypto_list.getModel();
@@ -229,6 +231,7 @@ public class AdminPage extends JFrame implements IPage{
         return true;
     }
 
+    // Function for removing a cryptocurrency from system
     public static boolean delete(String id){
         String query="DELETE FROM cryptocurrency WHERE uuid=?";
 
@@ -242,6 +245,7 @@ public class AdminPage extends JFrame implements IPage{
         return true;
     }
 
+    // Function for storing a cryptocurrency from system
     public static ArrayList<Cryptocurrency> getSystemCryptocurrencies(){
         ArrayList<Cryptocurrency> systemCryptoList =new ArrayList<>();
         Cryptocurrency obj;

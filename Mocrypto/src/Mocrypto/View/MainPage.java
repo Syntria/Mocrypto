@@ -46,6 +46,7 @@ public class MainPage extends JFrame implements IPage{
 
     private DefaultComboBoxModel comboBoxModelForCoinList;
     private DefaultComboBoxModel comboBoxModelForPortfolio;
+
     private DefaultTableModel model_crypto_list;
     private Object[] row_cryptocurrency_list;
 
@@ -54,7 +55,6 @@ public class MainPage extends JFrame implements IPage{
 
     private DefaultTableModel model_transaction_list;
     private Object[] row_transaction_list;
-    private Object[] row_base_coin_list;
 
     private ArrayList<Cryptocurrency> cryptocurrencyList = new ArrayList<>();
     private static User currentUser;
@@ -64,12 +64,13 @@ public class MainPage extends JFrame implements IPage{
 
         currentUser = user;
 
+        // Retrieving user portfloio from database
         currentUser.setPortfolio(new Portfolio());
-
         currentUser.getPortfolio().setCryptocurrencies(getPortfolio());
 
         display();
 
+        // Updating cryptocurrencies prices and user's balance
         btn_refresh.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -89,6 +90,7 @@ public class MainPage extends JFrame implements IPage{
 
         });
 
+        // Displaying selected cryptocurrency
         tbl_crypto_list.getSelectionModel().addListSelectionListener(e -> {
             try{
                 String selected_crypto_name = tbl_crypto_list.getValueAt(tbl_crypto_list.getSelectedRow(),1).toString();
@@ -98,6 +100,7 @@ public class MainPage extends JFrame implements IPage{
             }
 
         });
+        // Going back to login page when user click quit
         btn_logout.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,6 +112,8 @@ public class MainPage extends JFrame implements IPage{
                 LoginPage loginPage = new LoginPage();
             }
         });
+
+        // Adding bought cryptocurrency to user portfolio and transaction
         btn_crypto_buy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -123,6 +128,7 @@ public class MainPage extends JFrame implements IPage{
             }
         });
 
+        // Displaying selected cryptocurrency
         tbl_portfolio_list.getSelectionModel().addListSelectionListener(e -> {
             try{
                 String selected_crypto_name = tbl_portfolio_list.getValueAt(tbl_portfolio_list.getSelectedRow(),1).toString();
@@ -133,8 +139,7 @@ public class MainPage extends JFrame implements IPage{
 
         });
 
-
-
+        // Selling user selected cryptocurrency from user portfolio and storing transaction
         btn_crypto_sell.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -154,6 +159,7 @@ public class MainPage extends JFrame implements IPage{
     @Override
     public void display() {
 
+        // Arranging page display properties
         add(wrapper);
         setSize(1000,500);
         int x= Helper.screenCenterPoint("x",getSize());
@@ -163,6 +169,7 @@ public class MainPage extends JFrame implements IPage{
         setTitle(Config.PROJECT_TITLE);
         setVisible(true);
 
+        // Getting system's cryptocurrencies
         cryptocurrencyList = getCryptocurrencyList();
 
 
@@ -179,7 +186,7 @@ public class MainPage extends JFrame implements IPage{
         loadBaseCoinListModel(currentUser.getPortfolio().getCryptocurrencies(),combo_box_portfolio);
 
 
-
+        // Creating cryptocurrencies table
         model_crypto_list = new DefaultTableModel();
         Object[] col_cryptoList= {"Name","Symbol", "Current Price"};
         model_crypto_list.setColumnIdentifiers(col_cryptoList);
@@ -189,7 +196,7 @@ public class MainPage extends JFrame implements IPage{
         tbl_crypto_list.getColumnModel().getColumn(0).setMaxWidth(75);
         tbl_crypto_list.getTableHeader().setReorderingAllowed(false);
 
-
+        // Creating portfolio table
         model_portfolio_list = new DefaultTableModel();
         Object[] col_portfolioList= {"Name","Symbol", "Amount","Current Price"};
         model_portfolio_list.setColumnIdentifiers(col_portfolioList);
@@ -199,7 +206,7 @@ public class MainPage extends JFrame implements IPage{
         tbl_portfolio_list.getColumnModel().getColumn(0).setMaxWidth(75);
         tbl_portfolio_list.getTableHeader().setReorderingAllowed(false);
 
-
+        // Creating transactions table
         model_transaction_list = new DefaultTableModel();
         Object[] col_transactionList= {"Type","Base", "Target","Amount", "Date"};
         model_transaction_list.setColumnIdentifiers(col_transactionList);
@@ -210,7 +217,7 @@ public class MainPage extends JFrame implements IPage{
         tbl_transaction_list.getTableHeader().setReorderingAllowed(false);
     }
 
-
+    // Function for updating system's cryptocurrencies
     private void loadCryptocurrencyModel(ArrayList<Cryptocurrency> cryptocurrencyList) {
         DefaultTableModel clearModel=(DefaultTableModel) tbl_crypto_list.getModel();
         clearModel.setRowCount(0);
@@ -236,6 +243,7 @@ public class MainPage extends JFrame implements IPage{
         }
     }
 
+    // Function for retrieving system's cryptocurrencies from database
     public static ArrayList<Cryptocurrency> getCryptocurrencyList(){
         ArrayList<Cryptocurrency> cryptocurrencyList =new ArrayList<>();
 
@@ -259,30 +267,7 @@ public class MainPage extends JFrame implements IPage{
         return cryptocurrencyList;
     }
 
-    public static boolean addDatabase(int user_id,String crypto_id,String shortname,double buy_price, double amount){
-        String query="INSERT INTO owned_cryptocurrency (user_id,crypto_id,shortname,buy_price,amount) VALUES (?,?,?,?,?,?)";
-
-        try {
-            PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);
-            pr.setInt(1,user_id);
-            pr.setString(2,crypto_id);
-            pr.setString(3,shortname);
-            pr.setDouble(4,buy_price);
-            pr.setDouble(5,amount);
-            int response= pr.executeUpdate();
-
-            if(response == -1){
-                Helper.showMsg("error");
-            }
-            return response != -1;
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-
-        return true;
-    }
-
+    // Function for updating user portfolio
     private void loadPortfolioModel(ArrayList<Cryptocurrency> portfolioCryptocurrencyList) {
         DefaultTableModel clearModel=(DefaultTableModel) tbl_portfolio_list.getModel();
         clearModel.setRowCount(0);
@@ -297,6 +282,7 @@ public class MainPage extends JFrame implements IPage{
         }
     }
 
+    // Function for retrieving user portfolio from database
     private static ArrayList<Cryptocurrency> getPortfolio() {
 
         ArrayList<Cryptocurrency> cryptocurrencyList =new ArrayList<>();
@@ -369,7 +355,7 @@ public class MainPage extends JFrame implements IPage{
 
     }
 
-
+    // Function for updating user transactions
     private void loadTransactionModel(ArrayList<Transaction> transactionList) {
         DefaultTableModel clearModel=(DefaultTableModel) tbl_transaction_list.getModel();
         clearModel.setRowCount(0);
@@ -387,6 +373,7 @@ public class MainPage extends JFrame implements IPage{
         }
     }
 
+    // Function for retrieving user transactions from database
     private static ArrayList<Transaction> getTransactions() {
 
         ArrayList<Transaction> transactionsList =new ArrayList<>();
@@ -414,6 +401,7 @@ public class MainPage extends JFrame implements IPage{
 
     }
 
+    // Function for storing user transactions
     public static boolean addDatabase(Transaction transaction){
         String query="INSERT INTO transaction (user_id,type,amount,base_crypto,target_crypto,time_stamp) VALUES (?,?,?,?,?,?)";
 
