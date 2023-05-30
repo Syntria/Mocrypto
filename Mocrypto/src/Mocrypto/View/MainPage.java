@@ -8,6 +8,7 @@ import Mocrypto.Model.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
@@ -43,6 +44,7 @@ public class MainPage extends JFrame implements IPage{
     private JLabel lbl_mainpage_totalbalance;
     private JButton btn_logout;
     private JButton btn_refresh;
+    private JLabel general_profit_label;
 
     private DefaultComboBoxModel comboBoxModelForCoinList;
     private DefaultComboBoxModel comboBoxModelForPortfolio;
@@ -61,12 +63,15 @@ public class MainPage extends JFrame implements IPage{
     private static CryptocurrencyAPI cryptocurrencyAPI = new CryptocurrencyAPI();
 
     public MainPage(User user) {
+        setIconImage(new ImageIcon(getClass().getResource("/image/app_icon.png")).getImage());
 
         currentUser = user;
 
         // Retrieving user portfolio from database
         currentUser.setPortfolio(new Portfolio());
         currentUser.getPortfolio().setCryptocurrencies(getPortfolio());
+
+        double portfolioValue = currentUser.getPortfolio().getCurrentValue();
 
         display();
 
@@ -77,19 +82,15 @@ public class MainPage extends JFrame implements IPage{
 
                 for (Cryptocurrency cryptocurrency: cryptocurrencyList) {
                     cryptocurrency.setPrice(cryptocurrencyAPI.getExchangeRate(cryptocurrency));
-
-                    System.out.println(cryptocurrency.getPrice());
                 }
 
                 for (Cryptocurrency cryptocurrency: currentUser.getPortfolio().getCryptocurrencies()) {
                     cryptocurrency.setPrice(cryptocurrencyAPI.getExchangeRate(cryptocurrency));
-
-                    System.out.println(cryptocurrency.getPrice());
                 }
 
                 currentUser.setBalance(currentUser.getBalance());
 
-                lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getPortfolio().getCurrentValue() + " USDT");
+                lbl_mainpage_totalbalance.setText("Your total balance is: " + portfolioValue + " USDT");
 
                 loadCryptocurrencyModel(cryptocurrencyList);
                 loadPortfolioModel(currentUser.getPortfolio().getCryptocurrencies());
@@ -179,10 +180,17 @@ public class MainPage extends JFrame implements IPage{
         // Getting system's cryptocurrencies
         cryptocurrencyList = getCryptocurrencyList();
 
-
+        double portfolioValue = currentUser.getPortfolio().getCurrentValue();
         lbl_mainpage_welcome.setText("Welcome: " + currentUser.getName() + " " + currentUser.getSurname());
-        lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getPortfolio().getCurrentValue() + " USDT");
-
+        lbl_mainpage_totalbalance.setText("Your total balance is: " + portfolioValue + " USDT");
+        double profit = portfolioValue - 10000;
+        if (profit > 0)
+            general_profit_label.setForeground(Color.green);
+        else if (profit < 0)
+            general_profit_label.setForeground(Color.red);
+        else
+            general_profit_label.setForeground(Color.lightGray);
+        general_profit_label.setText("General Profit: " + profit + " USDT");
 
         comboBoxModelForCoinList = new DefaultComboBoxModel<>();
         combo_box_currencies.setModel(comboBoxModelForCoinList);
@@ -333,7 +341,6 @@ public class MainPage extends JFrame implements IPage{
         }
 
         for (Cryptocurrency cryptocurrency : user.getPortfolio().getCryptocurrencies()) {
-            System.out.println(cryptocurrency.getShortname());
             query="INSERT INTO portfolio (user_id,uuid,short_name,name,amount) VALUES (?,?,?,?,?)";
 
             try {

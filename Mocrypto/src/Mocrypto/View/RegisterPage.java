@@ -13,7 +13,6 @@ import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class RegisterPage extends JFrame implements IPage{
     private JPanel pnl_user_register;
@@ -24,6 +23,7 @@ public class RegisterPage extends JFrame implements IPage{
     private JTextField fld_user_password;
     private JTextField fld_user_surname;
     private JPanel wrapper;
+    private JButton btn_user_back;
 
     public RegisterPage() {
 
@@ -32,7 +32,7 @@ public class RegisterPage extends JFrame implements IPage{
 
     @Override
     public void display() {
-
+        setIconImage(new ImageIcon(getClass().getResource("/image/app_icon.png")).getImage());
         // Arranging page display properties
         add(wrapper);
         setSize(400,500);
@@ -63,6 +63,14 @@ public class RegisterPage extends JFrame implements IPage{
                     }
                 }
 
+            }
+        });
+
+        btn_user_back.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                LoginPage loginPage = new LoginPage();
             }
         });
 

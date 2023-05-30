@@ -39,12 +39,10 @@ public class Exchange {
             indexCounter++;
         }
         if (contains) {
-            System.out.println("!CONTAINS!");
             // Add the new amount to the coin (update the amount)
             cryptocurrencies.get(indexCounter).addAmount(amount);
         }
         else{ // If the target coin is not in the user's portfolio
-            System.out.println("!NOT CONTAINS!");
             // Create a new coin object not to change original coin list
             Cryptocurrency cryptocurrency = targetCryptocurrency;
             // Add the amount to the coin
@@ -60,22 +58,16 @@ public class Exchange {
 
     public Transaction buyCryptocurrency(double baseCoinAmount, String type){
 
-        System.out.println("initial target amount : " + targetCryptocurrency.getAmount());
-        System.out.println("initial base amount : " + baseCryptocurrency.getAmount());
         Portfolio portfolio = user.getPortfolio();
 
-        System.out.println(baseCryptocurrency.getName());
         int baseCoinIndex = getIndexOfCurrency(portfolio.getCryptocurrencies(),baseCryptocurrency.getShortname());
         if(baseCoinIndex == user.getPortfolio().getCryptocurrencies().size()){
             Helper.showMsg(baseCryptocurrency.getShortname() + " isn't available in your portfolio!");
             return null;
         }
         Cryptocurrency baseCryptocurrencyInPortfolio = portfolio.getCryptocurrencies().get(baseCoinIndex);
-        System.out.println("wanted amount : " + baseCoinAmount);
-        System.out.println("portfolio amount : " + baseCryptocurrencyInPortfolio.getAmount());
 
         if(baseCoinAmount <= baseCryptocurrencyInPortfolio.getAmount()) { // If user has sufficient balance
-            System.out.println("!Sufficient Balance!");
             CryptocurrencyAPI API = new CryptocurrencyAPI();
             double targetCoinAmount = baseCoinAmount * 1/API.getExchangeRate(targetCryptocurrency,baseCryptocurrency); // Store the amount of the target coin
             // Add the target coin to the user portfolio
@@ -93,23 +85,12 @@ public class Exchange {
             // Update the user portfolio
             user.setPortfolio(portfolio);
 
-            System.out.println();
-            for(Cryptocurrency cryptocurrency : user.getPortfolio().getCryptocurrencies()){
-                System.out.println(cryptocurrency.getShortname() + " " + cryptocurrency.getAmount());
-            }
-            System.out.println();
-            System.out.println();
-            System.out.println();
-            System.out.println();
-
-
             // Create a transaction
             Transaction transaction = new Transaction(type,targetCoinAmount,targetCryptocurrency.getShortname(),baseCryptocurrency.getShortname());
             return transaction;
         }
         else{
             Helper.showMsg("Insufficient Balance!");
-            System.out.println("!Insufficient Balance!");
             return null;
         }
      } // end buyCryptocurrency

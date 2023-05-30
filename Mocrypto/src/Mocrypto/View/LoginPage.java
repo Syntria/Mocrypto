@@ -39,6 +39,7 @@ public class LoginPage extends JFrame implements IPage{
     @Override
     public void display() {
 
+        setIconImage(new ImageIcon(getClass().getResource("/image/app_icon.png")).getImage());
         // Arranging page display properties
         add(wrapper);
         setSize(400,500);
