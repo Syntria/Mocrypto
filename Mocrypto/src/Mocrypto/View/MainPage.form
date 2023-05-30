@@ -167,6 +167,7 @@
                     <properties>
                       <editable value="false"/>
                       <enabled value="false"/>
+                      <horizontalAlignment value="0"/>
                     </properties>
                   </component>
                   <component id="f2dfa" class="javax.swing.JLabel">

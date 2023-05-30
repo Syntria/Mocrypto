@@ -111,17 +111,9 @@ public class LoginPage extends JFrame implements IPage{
     // Creating necessary tables in MySQL database
     private static void initializeDatabase () throws SQLException {
 
-        String query = "DROP TABLE `account`;";
+        String query;
+        PreparedStatement pr;
 
-        PreparedStatement pr = SQLConnector.getInstance().prepareStatement(query);;
-
-
-        pr.execute();
-
-        query = "DROP TABLE `cryptocurrency`;";
-
-        pr = SQLConnector.getInstance().prepareStatement(query);
-        pr.execute();
 
          query="CREATE TABLE `account` (\n" +
                 "\t`id` INT NOT NULL AUTO_INCREMENT,\n" +
@@ -152,16 +144,7 @@ public class LoginPage extends JFrame implements IPage{
 
 
 
-        query="CREATE TABLE `transaction` (\n" +
-                "\t`id` INT NOT NULL AUTO_INCREMENT,\n" +
-                "\t`type` VARCHAR(4) NOT NULL,\n" +
-                "\t`amount` DOUBLE NOT NULL,\n" +
-                "\t`bought_coin` VARCHAR(255) NOT NULL,\n" +
-                "\t`sold_coin` VARCHAR(255) NOT NULL,\n" +
-                "\t`time_stamp` DOUBLE NOT NULL,\n" +
-                "\t`recipient_address` VARCHAR(255) NOT NULL,\n" +
-                "\tPRIMARY KEY (`id`)\n" +
-                ");";
+        query="CREATE TABLE portfolio (user_id INTEGER NOT NULL,uuid VARCHAR(255) NOT NULL,short_name VARCHAR(255) NOT NULL,name VARCHAR(255) NOT NULL,amount DOUBLE NOT NULL);";
 
         pr = SQLConnector.getInstance().prepareStatement(query);
         pr.execute();
@@ -172,15 +155,18 @@ public class LoginPage extends JFrame implements IPage{
         pr = SQLConnector.getInstance().prepareStatement(query);
         pr.execute();
 
+		query = "INSERT INTO account (name, surname, username, password, balance, type) VALUES ('admin', 'admin', 'admin', 'admin', 100000, 'admin');";
+
+        pr = SQLConnector.getInstance().prepareStatement(query);
+        pr.execute();
+
     }
 
 
 
 
     public static void main(String[] args) throws SQLException {
-
-        //initializeDatabase();
-
+        initializeDatabase(); // This line is to be run only once. Running this multiple times will create errors.
         Helper.setLayout();
         LoginPage login=new LoginPage();
     }

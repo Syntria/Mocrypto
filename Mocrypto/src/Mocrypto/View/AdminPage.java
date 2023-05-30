@@ -73,7 +73,7 @@ public class AdminPage extends JFrame implements IPage{
     }
 
     public void display() {
-
+		this.setIconImage((new ImageIcon(this.getClass().getResource("/image/app_icon.png"))).getImage());
         // Arranging page display properties
         add(wrapper);
         setSize(1000,500);

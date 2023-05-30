@@ -128,7 +128,7 @@ public class MainPage extends JFrame implements IPage{
                 Cryptocurrency selectedCoin = cryptocurrencyList.get(tbl_crypto_list.getSelectedRow());
                 String shortName = (String) combo_box_currencies.getSelectedItem();
                 int index = Exchange.getIndexOfCurrency(currentUser.getPortfolio().getCryptocurrencies(),shortName);
-                Cryptocurrency baseCoin = cryptocurrencyList.get(index);
+                Cryptocurrency baseCoin = currentUser.getPortfolio().getCryptocurrencies().get(index);
                 Exchange exchange = new Exchange(currentUser,selectedCoin,baseCoin);
                 double amount = Double.parseDouble(fld_cryptobuy_amount.getText());
                 addDatabase(exchange.buyCryptocurrency(amount,"BUY"));

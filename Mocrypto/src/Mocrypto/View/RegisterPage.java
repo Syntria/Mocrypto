@@ -55,7 +55,6 @@ public class RegisterPage extends JFrame implements IPage{
                     String username=fld_user_username.getText();
                     String pass=fld_user_password.getText();
                     if(add(name,surname,username,pass)){
-                        System.out.println("searched username : " + username);
                         add(username); // Initialize the user portfolio (added to the database)
                         Helper.showMsg("done");
                         dispose();
@@ -142,8 +141,6 @@ public class RegisterPage extends JFrame implements IPage{
              if(response == -1){
                  Helper.showMsg("error");
              }
-             else
-                 Helper.showMsg("Added to the database");
              return response != -1;
 
          } catch (SQLException e) {
