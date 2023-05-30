@@ -16,7 +16,6 @@ import java.sql.SQLException;
 
 public class LoginPage extends JFrame implements IPage{
     private JPanel wrapper;
-    private JPanel wtop;
     private JPanel wbottom;
     private JTextField fld_user_uname;
     private JPasswordField fld_user_pass;
@@ -74,7 +73,7 @@ public class LoginPage extends JFrame implements IPage{
     }
 
     // Retrieving account from database with respect to specified username and password
-    public static Account fetchAccount(String username,String pass){
+    private static Account fetchAccount(String username,String pass){
         Account obj=null;
         String query="SELECT * FROM account WHERE username=? AND password=?";
 

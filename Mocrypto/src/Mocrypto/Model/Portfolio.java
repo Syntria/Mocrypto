@@ -40,7 +40,7 @@ public class Portfolio {
 
         assert cryptocurrencies != null;
         for (Cryptocurrency cryptocurrency : this.cryptocurrencies){
-            totalAmount += cryptocurrency.getPrice();
+            totalAmount += cryptocurrency.getAmount()*cryptocurrency.getPrice();
         }
         this.currentValue = totalAmount;
         return currentValue;

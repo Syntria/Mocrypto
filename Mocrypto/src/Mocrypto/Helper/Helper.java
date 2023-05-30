@@ -1,5 +1,9 @@
 package Mocrypto.Helper;
 
+import Mocrypto.View.LoginPage;
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -7,6 +11,12 @@ public class Helper {
 
     // Setting layout to Nimbus design
     public static void setLayout(){
+        try {
+            UIManager.setLookAndFeel(new FlatMacDarkLaf());
+        } catch( Exception ex ) {
+            System.err.println( "Failed to initialize LaF" );
+        }
+        /*
         for(UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()){
             if("Nimbus".equals(info.getName())){
                 try {
@@ -17,6 +27,8 @@ public class Helper {
                 break;
             }
         }
+
+         */
     }
 
     // Getting screen's center point to create responsive design

@@ -33,7 +33,7 @@ public class AdminPage extends JFrame implements IPage{
     private JTextField field_removecrypto_name;
     private JButton button_admin_quit;
 
-    Object[] col_cryptoList= {"ID","Name","Symbol"};
+    private Object[] col_cryptoList= {"ID","Name","Symbol"};
 
     private DefaultTableModel model_allcrypto_list;
     private Object[] row_allcryptocurrency_list;
@@ -207,7 +207,7 @@ public class AdminPage extends JFrame implements IPage{
 
 
     // Function for adding cryptocurrency data to system database
-    public static boolean add(String uuid,String name,String shortname, double price, double volume){
+    private static boolean add(String uuid,String name,String shortname, double price, double volume){
         String query="INSERT INTO cryptocurrency (uuid,name,shortname,price,volume) VALUES (?,?,?,?,? )";
 
         try {
@@ -232,7 +232,7 @@ public class AdminPage extends JFrame implements IPage{
     }
 
     // Function for removing a cryptocurrency from system
-    public static boolean delete(String id){
+    private static boolean delete(String id){
         String query="DELETE FROM cryptocurrency WHERE uuid=?";
 
         try {
@@ -246,7 +246,7 @@ public class AdminPage extends JFrame implements IPage{
     }
 
     // Function for storing a cryptocurrency from system
-    public static ArrayList<Cryptocurrency> getSystemCryptocurrencies(){
+    private static ArrayList<Cryptocurrency> getSystemCryptocurrencies(){
         ArrayList<Cryptocurrency> systemCryptoList =new ArrayList<>();
         Cryptocurrency obj;
         try {

@@ -69,7 +69,7 @@ public class RegisterPage extends JFrame implements IPage{
     }
 
     // Function for adding user to database
-    public static boolean add(String name,String surname,String username,String password){
+    private static boolean add(String name,String surname,String username,String password){
         String query="INSERT INTO account (name,surname,username,password,balance,type) VALUES (?,?,?,?,10000,'user')";
         Account findUser = RegisterPage.fetchAccount(username);
         if(findUser!=null){
@@ -99,7 +99,7 @@ public class RegisterPage extends JFrame implements IPage{
 
 
     // Function for adding default cryptocurrency to user portfolio
-    public boolean add(String searchedUsername){
+    private boolean add(String searchedUsername){
 
          String query="INSERT INTO portfolio (user_id,uuid,short_name,name,amount) VALUES (?,?,?,?,?)";
          String query2="SELECT * FROM account WHERE username =?";
@@ -148,7 +148,7 @@ public class RegisterPage extends JFrame implements IPage{
 
 
     // Function for retrieving specified accont from database
-    public static Account fetchAccount(String username){
+    private static Account fetchAccount(String username){
         Account obj=null;
         String query="SELECT * FROM account WHERE username =?";
 

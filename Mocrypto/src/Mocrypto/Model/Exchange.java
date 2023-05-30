@@ -65,7 +65,7 @@ public class Exchange {
         Portfolio portfolio = user.getPortfolio();
 
         System.out.println(baseCryptocurrency.getName());
-        int baseCoinIndex = getIndexOfCurrency(portfolio,baseCryptocurrency.getShortname());
+        int baseCoinIndex = getIndexOfCurrency(portfolio.getCryptocurrencies(),baseCryptocurrency.getShortname());
         if(baseCoinIndex == user.getPortfolio().getCryptocurrencies().size()){
             Helper.showMsg(baseCryptocurrency.getShortname() + " isn't available in your portfolio!");
             return null;
@@ -116,8 +116,8 @@ public class Exchange {
 
 
 
-    public static int getIndexOfCurrency (Portfolio portfolio, String shortName){
-        Iterator<Cryptocurrency> iterator = portfolio.getCryptocurrencies().iterator();
+    public static int getIndexOfCurrency (ArrayList<Cryptocurrency> cryptocurrencies, String shortName){
+        Iterator<Cryptocurrency> iterator = cryptocurrencies.iterator();
         int indexCounter = 0; // Store the index of the coin if occurs
         while (iterator.hasNext()){ // Check if the target coin is already bought
             Cryptocurrency check = iterator.next();

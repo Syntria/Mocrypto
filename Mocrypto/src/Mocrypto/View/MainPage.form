@@ -14,7 +14,9 @@
             <preferred-size width="200" height="200"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <font/>
+        </properties>
         <border type="none"/>
         <children>
           <grid id="83045" binding="pnl_cryptocurrencies" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -68,6 +70,7 @@
                     <properties>
                       <editable value="false"/>
                       <enabled value="false"/>
+                      <font style="1"/>
                       <horizontalAlignment value="0"/>
                     </properties>
                   </component>
@@ -84,6 +87,10 @@
                       <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
+                      <background color="-16731384"/>
+                      <font style="1"/>
+                      <inheritsPopupMenu value="false"/>
+                      <selected value="false"/>
                       <text value="Buy"/>
                     </properties>
                   </component>
@@ -101,7 +108,9 @@
                     <constraints>
                       <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
-                    <properties/>
+                    <properties>
+                      <font style="1"/>
+                    </properties>
                   </component>
                 </children>
               </grid>
@@ -183,6 +192,9 @@
                       <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
+                      <background color="-2424826"/>
+                      <font style="1"/>
+                      <foreground color="-1"/>
                       <text value="Sell"/>
                     </properties>
                   </component>
@@ -190,7 +202,10 @@
                     <constraints>
                       <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
-                    <properties/>
+                    <properties>
+                      <font style="1"/>
+                      <model/>
+                    </properties>
                   </component>
                 </children>
               </grid>
@@ -226,7 +241,9 @@
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
-        <properties/>
+        <properties>
+          <font style="1"/>
+        </properties>
         <border type="none"/>
         <children>
           <component id="29aa2" class="javax.swing.JLabel" binding="lbl_mainpage_welcome">
@@ -255,6 +272,9 @@
               <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <background color="-2424826"/>
+              <font style="1"/>
+              <foreground color="-1"/>
               <text value="Quit"/>
             </properties>
           </component>
@@ -263,6 +283,9 @@
               <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <background color="-16769104"/>
+              <font style="1"/>
+              <foreground color="-1"/>
               <text value="Refresh"/>
             </properties>
           </component>

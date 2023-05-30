@@ -64,7 +64,7 @@ public class MainPage extends JFrame implements IPage{
 
         currentUser = user;
 
-        // Retrieving user portfloio from database
+        // Retrieving user portfolio from database
         currentUser.setPortfolio(new Portfolio());
         currentUser.getPortfolio().setCryptocurrencies(getPortfolio());
 
@@ -81,11 +81,18 @@ public class MainPage extends JFrame implements IPage{
                     System.out.println(cryptocurrency.getPrice());
                 }
 
+                for (Cryptocurrency cryptocurrency: currentUser.getPortfolio().getCryptocurrencies()) {
+                    cryptocurrency.setPrice(cryptocurrencyAPI.getExchangeRate(cryptocurrency));
+
+                    System.out.println(cryptocurrency.getPrice());
+                }
+
                 currentUser.setBalance(currentUser.getBalance());
 
-                lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getBalance() + " USD");
+                lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getPortfolio().getCurrentValue() + " USDT");
 
                 loadCryptocurrencyModel(cryptocurrencyList);
+                loadPortfolioModel(currentUser.getPortfolio().getCryptocurrencies());
             }
 
         });
@@ -119,8 +126,8 @@ public class MainPage extends JFrame implements IPage{
             public void actionPerformed(ActionEvent e) {
                 Cryptocurrency selectedCoin = cryptocurrencyList.get(tbl_crypto_list.getSelectedRow());
                 String shortName = (String) combo_box_currencies.getSelectedItem();
-                int index = Exchange.getIndexOfCurrency(currentUser.getPortfolio(),shortName);
-                Cryptocurrency baseCoin = cryptocurrencyList.get(index); // temporary --<vodka USDT
+                int index = Exchange.getIndexOfCurrency(currentUser.getPortfolio().getCryptocurrencies(),shortName);
+                Cryptocurrency baseCoin = cryptocurrencyList.get(index);
                 Exchange exchange = new Exchange(currentUser,selectedCoin,baseCoin);
                 double amount = Double.parseDouble(fld_cryptobuy_amount.getText());
                 addDatabase(exchange.buyCryptocurrency(amount,"BUY"));
@@ -145,8 +152,8 @@ public class MainPage extends JFrame implements IPage{
             public void actionPerformed(ActionEvent e) {
                 Cryptocurrency selectedCoin = currentUser.getPortfolio().getCryptocurrencies().get(tbl_portfolio_list.getSelectedRow());
                 String shortName = (String) combo_box_portfolio.getSelectedItem();
-                int index = Exchange.getIndexOfCurrency(currentUser.getPortfolio(),shortName);
-                Cryptocurrency baseCoin = currentUser.getPortfolio().getCryptocurrencies().get(index); // temporary --<vodka USDT
+                int index = Exchange.getIndexOfCurrency(cryptocurrencyList,shortName);
+                Cryptocurrency baseCoin = cryptocurrencyList.get(index);
                 Exchange exchange = new Exchange(currentUser,baseCoin,selectedCoin);
                 double amount = Double.parseDouble(fld_cryptosell_amount.getText());
                 addDatabase(exchange.buyCryptocurrency(amount,"SELL"));
@@ -174,7 +181,7 @@ public class MainPage extends JFrame implements IPage{
 
 
         lbl_mainpage_welcome.setText("Welcome: " + currentUser.getName() + " " + currentUser.getSurname());
-        lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getBalance() + " USD");
+        lbl_mainpage_totalbalance.setText("Your total balance is: " + currentUser.getPortfolio().getCurrentValue() + " USDT");
 
 
         comboBoxModelForCoinList = new DefaultComboBoxModel<>();
@@ -183,7 +190,7 @@ public class MainPage extends JFrame implements IPage{
 
         comboBoxModelForPortfolio = new DefaultComboBoxModel<>();
         combo_box_portfolio.setModel(comboBoxModelForPortfolio);
-        loadBaseCoinListModel(currentUser.getPortfolio().getCryptocurrencies(),combo_box_portfolio);
+        loadBaseCoinListModel(cryptocurrencyList,combo_box_portfolio);
 
 
         // Creating cryptocurrencies table
@@ -198,7 +205,7 @@ public class MainPage extends JFrame implements IPage{
 
         // Creating portfolio table
         model_portfolio_list = new DefaultTableModel();
-        Object[] col_portfolioList= {"Name","Symbol", "Amount","Current Price"};
+        Object[] col_portfolioList= {"Name","Symbol", "Amount","Current Price", "USDT Value"};
         model_portfolio_list.setColumnIdentifiers(col_portfolioList);
         row_portfolio_list = new Object[col_portfolioList.length];
         loadPortfolioModel(currentUser.getPortfolio().getCryptocurrencies());
@@ -233,8 +240,6 @@ public class MainPage extends JFrame implements IPage{
 
 
     private void loadBaseCoinListModel(ArrayList<Cryptocurrency> cryptocurrencyList, JComboBox comboBox) {
-        DefaultComboBoxModel clearModel=(DefaultComboBoxModel) combo_box_currencies.getModel();
-
         int i=0;
         for(Cryptocurrency obj: cryptocurrencyList){
             i=0;
@@ -244,7 +249,7 @@ public class MainPage extends JFrame implements IPage{
     }
 
     // Function for retrieving system's cryptocurrencies from database
-    public static ArrayList<Cryptocurrency> getCryptocurrencyList(){
+    private static ArrayList<Cryptocurrency> getCryptocurrencyList(){
         ArrayList<Cryptocurrency> cryptocurrencyList =new ArrayList<>();
 
         Cryptocurrency cryptocurrency;
@@ -278,6 +283,7 @@ public class MainPage extends JFrame implements IPage{
             row_portfolio_list[i++] = obj.getShortname();
             row_portfolio_list[i++] = obj.getAmount();
             row_portfolio_list[i++] = obj.getPrice();
+            row_portfolio_list[i++] = obj.getAmount() * obj.getPrice();
             model_portfolio_list.addRow(row_portfolio_list);
         }
     }
@@ -310,7 +316,7 @@ public class MainPage extends JFrame implements IPage{
     }
 
     // Function for storing user portfolio
-    public static boolean addDatabase(User user) {
+    private static boolean addDatabase(User user) {
 
         String query = "DELETE FROM portfolio WHERE user_id = " + currentUser.getId();
 
@@ -402,7 +408,7 @@ public class MainPage extends JFrame implements IPage{
     }
 
     // Function for storing user transactions
-    public static boolean addDatabase(Transaction transaction){
+    private static boolean addDatabase(Transaction transaction){
         String query="INSERT INTO transaction (user_id,type,amount,base_crypto,target_crypto,time_stamp) VALUES (?,?,?,?,?,?)";
 
         try {
